@@ -30,7 +30,7 @@ def calculate_arbitrage_profit(odds1, bet1, odds2, stake2):
 # Streamlit UI
 st.title("🔢 Delayed Arbitrage Betting Calculator")
 
-st.write("Step 1: Enter the first bet details. Step 2: Enter the second odds to calculate the required bet size for arbitrage.")
+st.write("Enter the first bet details and the second odds to instantly calculate the required bet size and arbitrage profit.")
 
 # Step 1: User inputs first bet
 odds1 = st.number_input("📌 Odds from Pinnacle (or fast book)", min_value=1.01, step=0.01, format="%.2f")
@@ -44,16 +44,14 @@ if min_odds2:
 # Step 2: User inputs second odds
 odds2 = st.number_input("📌 Second Odds (Slower Bookmaker)", min_value=1.01, step=0.01, format="%.2f")
 
-if st.button("🔍 Calculate Second Bet Amount & Profit"):
-    stake2 = calculate_stake(odds1, bet1, odds2)
-    profit, profit_percent = calculate_arbitrage_profit(odds1, bet1, odds2, stake2)
-    
-    if stake2 is None:
-        st.error("❌ Invalid second odds. Please enter valid values.")
-    else:
-        st.success(f"✅ To complete the arbitrage, place a bet of **€{stake2:.2f}** on the second odds.")
-        if profit is not None:
-            st.success(f"💰 Expected Arbitrage Profit: **€{profit:.2f} ({profit_percent:.2f}%)**")
+# Automatically calculate second bet and profit
+stake2 = calculate_stake(odds1, bet1, odds2)
+profit, profit_percent = calculate_arbitrage_profit(odds1, bet1, odds2, stake2)
+
+if stake2 is not None:
+    st.success(f"✅ To complete the arbitrage, place a bet of **€{stake2:.2f}** on the second odds.")
+    if profit is not None:
+        st.success(f"💰 Expected Arbitrage Profit: **€{profit:.2f} ({profit_percent:.2f}%)**")
 
 st.markdown("---")
-st.markdown("⚡ **Tip:** Use this tool to determine both the required second odds and the stake to guarantee a profitable arbitrage opportunity.")
+st.markdown("⚡ **Tip:** This tool updates in real-time to provide instant calculations for your arbitrage opportunities.")
