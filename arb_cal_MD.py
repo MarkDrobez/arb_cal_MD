@@ -1,46 +1,29 @@
 import streamlit as st
 
-def calculate_arbitrage(odds1, odds2, total_bet):
-    if odds1 <= 1 or odds2 <= 1:
-        return None, None, None, None
+def calculate_minimum_odds(odds1, bet1, target_profit=0.002):
+    if odds1 <= 1 or bet1 <= 0:
+        return None  # Invalid input
     
-    # Convert odds to implied probabilities
-    prob1 = 1 / odds1
-    prob2 = 1 / odds2
-    total_prob = prob1 + prob2
-    
-    # Check if arbitrage exists
-    if total_prob >= 1:
-        return None, None, None, None  # No arbitrage opportunity
-    
-    # Calculate bet sizing
-    stake1 = (total_bet * prob2) / total_prob
-    stake2 = (total_bet * prob1) / total_prob
-
-    # Calculate guaranteed profit
-    profit = (stake1 * odds1) - total_bet
-    return stake1, stake2, profit, (profit / total_bet) * 100
+    # Solve for minimum odds2 required to achieve at least 0.2% arbitrage
+    min_odds2 = (bet1 * odds1) / (bet1 * (1 + target_profit))
+    return min_odds2
 
 # Streamlit UI
 st.title("🔢 Delayed Arbitrage Betting Calculator")
 
-st.write("Enter the odds from two sportsbooks and your total bet amount to check for an arbitrage opportunity.")
+st.write("Enter the odds from the first bookmaker and your bet amount to calculate the minimum required odds on the other side for arbitrage.")
 
 # User Inputs
 odds1 = st.number_input("📌 Odds from Pinnacle (or fast book)", min_value=1.01, step=0.01, format="%.2f")
-odds2 = st.number_input("📌 Odds from slow book (before adjustment)", min_value=1.01, step=0.01, format="%.2f")
-total_bet = st.number_input("💰 Total Bet Amount (€)", min_value=1.0, step=1.0, format="%.2f")
+bet1 = st.number_input("💰 Bet Amount (€)", min_value=1.0, step=1.0, format="%.2f")
 
-if st.button("🔍 Calculate Arbitrage"):
-    stake1, stake2, profit, profit_percent = calculate_arbitrage(odds1, odds2, total_bet)
+if st.button("🔍 Calculate Minimum Required Odds"):
+    min_odds2 = calculate_minimum_odds(odds1, bet1)
     
-    if profit is None:
-        st.error("❌ No arbitrage opportunity detected. The combined implied probability is too high.")
+    if min_odds2 is None:
+        st.error("❌ Invalid input. Please enter valid odds and bet amount.")
     else:
-        st.success(f"✅ Arbitrage Opportunity Found!")
-        st.write(f"**Bet €{stake1:.2f} on odds {odds1}**")
-        st.write(f"**Bet €{stake2:.2f} on odds {odds2}**")
-        st.write(f"**Guaranteed Profit: €{profit:.2f} ({profit_percent:.2f}%)**")
+        st.success(f"✅ To achieve at least 0.2% arbitrage, the second odds must be **{min_odds2:.2f}** or higher.")
 
 st.markdown("---")
-st.markdown("⚡ **Tip:** This tool helps detect delayed arbitrage where one sportsbook adjusts odds slower than another.")
+st.markdown("⚡ **Tip:** Use this tool to determine the necessary odds on the slower bookmaker to secure a profitable arbitrage opportunity.")
