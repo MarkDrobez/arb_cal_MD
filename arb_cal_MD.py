@@ -1,11 +1,11 @@
 import streamlit as st
 
-def calculate_minimum_odds(odds1, bet1, target_profit=0.002):
-    if odds1 <= 1 or bet1 <= 0:
+def calculate_minimum_odds(odds1, target_profit=0.002):
+    if odds1 <= 1:
         return None  # Invalid input
     
-    # Solve for minimum odds2 required to achieve at least 0.2% arbitrage
-    min_odds2 = (bet1 * odds1) / (bet1 * (1 + target_profit))
+    # Correct formula for minimum required odds to achieve at least 0.2% arbitrage
+    min_odds2 = 1 / (1 - (1 / odds1 + target_profit))
     return min_odds2
 
 def calculate_stake(odds1, bet1, odds2):
@@ -26,7 +26,7 @@ odds1 = st.number_input("📌 Odds from Pinnacle (or fast book)", min_value=1.01
 bet1 = st.number_input("💰 Bet Amount (€) on first odds", min_value=1.0, step=1.0, format="%.2f")
 
 # Step 1 Output: Minimum required odds for arbitrage
-min_odds2 = calculate_minimum_odds(odds1, bet1)
+min_odds2 = calculate_minimum_odds(odds1)
 if min_odds2:
     st.info(f"ℹ️ Minimum required odds for at least 0.2% arbitrage: **{min_odds2:.2f}**")
 
